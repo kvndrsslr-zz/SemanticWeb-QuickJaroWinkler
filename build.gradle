@@ -1,0 +1,8 @@
+apply plugin: 'idea'
+apply plugin: 'java'
+repositories { mavenCentral() }
+dependencies {
+    //for dependencies found in artifact repositories you can use
+    //the group:name:version notation
+    compile 'commons-cli:commons-cli:1.1'
+}
