@@ -5,7 +5,7 @@ import java.io.FileInputStream;
 import java.io.FileWriter;
 import java.util.*;
 
-public class JaroWinklerMatcher {
+public class  JaroWinklerMatcher {
 
     private double threshold;
     private long comps;

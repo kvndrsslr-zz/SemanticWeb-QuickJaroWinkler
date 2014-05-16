@@ -12,7 +12,8 @@
     </content>
     <orderEntry type="inheritedJdk" />
     <orderEntry type="sourceFolder" forTests="false" />
-    <orderEntry type="library" name="nxparser-1.2.3" level="project" />
+    <orderEntry type="library" exported="" name="Gradle: nxparser-1.2.3" level="project" />
+    <orderEntry type="library" exported="" name="Gradle: commons-cli-1.2" level="project" />
   </component>
 </module>
 
