@@ -44,6 +44,6 @@ public class JaroWinklerLengthFilter extends AbstractMetricFilter {
         if (threshold <= 0.8d)
             return -1;
         else
-            return (int) Math.round(Math.floor((0.6d * (double) aLen)/(3.0d * threshold - 2.4d) - (double) aLen));
+            return (int) Math.round(Math.ceil((0.6d * (double) aLen)/(3.0d * threshold - 2.4d) - (double) aLen));
     }
 }

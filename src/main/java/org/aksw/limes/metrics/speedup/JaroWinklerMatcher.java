@@ -42,10 +42,12 @@ public class  JaroWinklerMatcher {
         offsetCalc = Math.log10((double) listB.size());
         offsetB = (int) Math.round(Math.pow(offsetCalc / 2.0d, offsetCalc));
         lastIndex = 0;
+        //offsetA = offsetB = 1;
         maxIndex = listB.size() - 1;
         for (i = 0; i < listA.size(); i++) {
             s1 = listA.get(i);
             if (i == 0 || s1.length() != listA.get(i-1).length()) {
+                maxIndex = listB.size() - 1;
                 delta = JaroWinklerLengthFilter.maxLenDeltaFor(s1.length(), threshold);
                 for (j = lastIndex; j < listB.size(); j+=offsetB) {
                     s2 = listB.get(j);
@@ -73,7 +75,6 @@ public class  JaroWinklerMatcher {
             if (maxIndex > 0 && minTargetIndex.get(maxIndex) == 0)
                 minTargetIndex.set(maxIndex, i);
         }
-        Iterator<Integer> it = minTargetIndex.iterator();
         Integer lastHit = 0;
         for (j = 0; j < minTargetIndex.size(); j++) {
             if (minTargetIndex.get(j) < lastHit) {
@@ -82,6 +83,7 @@ public class  JaroWinklerMatcher {
                 lastHit = minTargetIndex.get(j);
             }
         }
+        System.out.print("");
     }
 
     public HashMap<String, Map<String, Double>> match () {
@@ -95,8 +97,8 @@ public class  JaroWinklerMatcher {
         for (i = 0; i < listA.size(); i++) {
             a = listA.get(i);
             min = precomputeRanges ? minTargetIndex.get(i) : 0;
-            max = precomputeRanges ? maxTargetIndex.get(i) : listB.size();
-            for (j = min; j < max; j++) {
+            max = precomputeRanges ? maxTargetIndex.get(i) : listB.size() - 1;
+            for (j = min; j <= max; j++) {
                 b = listB.get(j);
                 if (j == min)
                     currentSim = metric.proximity(a, b);
@@ -114,72 +116,4 @@ public class  JaroWinklerMatcher {
         return similarityBook;
     }
 
-    public static void main  (String[] args) throws Exception{
-        double threshold = 0.95d;
-        JaroWinklerMetric jw = new JaroWinklerMetric(true, false, false);
-        jw.addFilter(new JaroWinklerLengthFilter(threshold));
-        jw.addFilter(new JaroWinklerEntropyFilter(threshold));
-        ArrayList<String> listA, listB;
-        listA = new ArrayList<String>();
-        listB = new ArrayList<String>();
-
-        NxParser nxp = new NxParser(new FileInputStream("/Users/kvn/Downloads/DownloadStorage/labels_en_new.nt"));
-        int i = 0;
-        System.out.println("starting FILEREAD...");
-        System.out.println(new Date().toString());
-        while (nxp.hasNext() && i < 100000) {
-            String tmp = nxp.next()[2].toN3();
-            tmp = tmp.substring(1, tmp.lastIndexOf("@")-1);
-            listA.add(tmp);
-            listB.add(tmp);
-            i++;
-        }
-        JaroWinklerMatcher jwm;
-        FileWriter x;
-        HashMap<String, Map<String, Double>> matches;
-//        System.out.println("starting JaroWinkler with both filters and range cuts...");
-//        jwm = new JaroWinklerMatcher((ArrayList<String>) listA.clone(), (ArrayList<String>) listB.clone(), jw, threshold, true);
-//        matches = jwm.match();
-//        x = new FileWriter("/Users/kvn/Downloads/DownloadStorage/out.txt");
-//        x.write(matches.toString());
-//        x.flush();
-//        x.close();
-//        System.out.println(new Date().toString());
-        jw.eraseFilters();
-        jw.addFilter(new JaroWinklerLengthFilter(threshold));
-        System.out.println("starting JaroWinkler with length filter only and range cuts...");
-        jwm = new JaroWinklerMatcher((ArrayList<String>) listA.clone(), (ArrayList<String>) listB.clone(), jw, threshold, true);
-        matches = jwm.match();
-        x = new FileWriter("/Users/kvn/Downloads/DownloadStorage/out.txt");
-        x.write(matches.toString());
-        x.flush();
-        x.close();
-        System.out.println(new Date().toString());
-//        System.out.println("starting JaroWinkler with filters only...");
-//        jwm = new JaroWinklerMatcher((ArrayList<String>) listA.clone(), (ArrayList<String>) listB.clone(), jw, threshold, false);
-//        matches = jwm.match();
-//        x = new FileWriter("/Users/kvn/Downloads/DownloadStorage/out.txt");
-//        x.write(matches.toString());
-//        x.flush();
-//        x.close();
-//        System.out.println(new Date().toString());
-//        jw.eraseFilters();
-//        System.out.println("starting JaroWinkler with range cut only");
-//        jwm = new JaroWinklerMatcher((ArrayList<String>) listA.clone(), (ArrayList<String>) listB.clone(), jw, threshold, true);
-//        matches = jwm.match();
-//        x = new FileWriter("/Users/kvn/Downloads/DownloadStorage/out.txt");
-//        x.write(matches.toString());
-//        x.flush();
-//        x.close();
-//        System.out.println(new Date().toString());
-        jw.eraseFilters();
-        System.out.println("starting JaroWinkler completely naive");
-        jwm = new JaroWinklerMatcher((ArrayList<String>) listA.clone(), (ArrayList<String>) listB.clone(), jw, threshold, false);
-        matches = jwm.match();
-        x = new FileWriter("/Users/kvn/Downloads/DownloadStorage/out.txt");
-        x.write(matches.toString());
-        x.flush();
-        x.close();
-        System.out.println(new Date().toString());
-    }
 }

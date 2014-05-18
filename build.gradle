@@ -7,5 +7,22 @@ dependencies {
     //for dependencies found in artifact repositories you can use
     //the group:name:version notation
     compile files('libs/nxparser-1.2.3.jar')
-    compile 'commons-cli:commons-cli:1.2'
+    compile 'junit:junit:4.11'
+    compile 'com.carrotsearch:junit-benchmarks:0.7.2'
+    compile 'com.h2database:h2:1.3.160'
+}
+
+//defaultTasks 'clean','build','test','clean','test','clean','test'
+//, 'test', 'test', 'test', 'test'
+
+test.doFirst {
+    println "load data..."
+    try {
+        println "load data test $threshold $lines"
+        FileWriter f = new FileWriter("src/test/resources/testConfig.properties");
+        f.write("threshold=$threshold\nlines=$lines");
+        f.close();
+    } catch (Exception e) {
+
+    }
 }
