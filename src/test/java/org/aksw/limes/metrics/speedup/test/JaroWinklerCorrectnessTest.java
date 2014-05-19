@@ -24,13 +24,13 @@ public class JaroWinklerCorrectnessTest {
 
     @BeforeClass
     public static void setUpLists () {
-        threshold = 0.9999d;
+        threshold = (Double) JaroWinklerPerformanceTest.getProperties().get("threshold");
         listA = new ArrayList<String>();
         listB = new ArrayList<String>();
         try {
-            NxParser nxp = new NxParser(new FileInputStream("/Users/kvn/Downloads/DownloadStorage/labels_en_new.nt"));
+            NxParser nxp = new NxParser(new FileInputStream((String) JaroWinklerPerformanceTest.getProperties().get("testData")));
             int i = 0;
-            while (nxp.hasNext() && i < 4000) {
+            while (nxp.hasNext() && i < (Integer) JaroWinklerPerformanceTest.getProperties().get("lines")) {
                 String tmp = nxp.next()[2].toN3();
                 tmp = tmp.substring(1, tmp.lastIndexOf("@")-1);
                 listA.add(tmp);

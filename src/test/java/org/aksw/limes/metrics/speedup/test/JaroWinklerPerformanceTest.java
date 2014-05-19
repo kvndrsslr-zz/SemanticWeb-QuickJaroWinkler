@@ -20,6 +20,7 @@ import org.semanticweb.yars.nx.parser.NxParser;
 
 import java.io.*;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Properties;
 
 
@@ -27,25 +28,19 @@ import java.util.Properties;
 @BenchmarkHistoryChart(labelWith = LabelType.CUSTOM_KEY, maxRuns = 40)
 public class JaroWinklerPerformanceTest extends AbstractBenchmark {
 
-/*
-    new H2Consumer(
-            new File("benchmarks/charts/foo-db"),
-            new File("benchmarks/charts"),
-    "0.90");
-
- */
     private static H2Consumer consumer = getConsumer();
     private static ArrayList<String> listA, listB;
     private static double threshold;
     private static int lines;
+    public static String testData;
 
     @Rule
     public TestRule benchmarkRun = new BenchmarkRule(consumer);
 
-
-    public static H2Consumer getConsumer() {
-        threshold = 0.7d;
-        lines = 100;
+    public static HashMap<String, Object> getProperties() {
+        threshold = 0.9d;
+        lines = 1000;
+        testData = "labels_en.nt";
         Properties prop = new Properties();
         try {
             InputStream stream = new FileInputStream("src/test/resources/testConfig.properties");
@@ -53,12 +48,21 @@ public class JaroWinklerPerformanceTest extends AbstractBenchmark {
             stream.close();
             threshold = Double.valueOf(prop.getProperty("threshold"));
             lines = Integer.valueOf(prop.getProperty("lines"));
-
+            testData = prop.getProperty("testData").equals("") ? testData : prop.getProperty("testData");
         } catch (FileNotFoundException e) {
 
         } catch (IOException e) {
 
         }
+        HashMap<String, Object> rtn = new HashMap<String, Object>();
+        rtn.put("threshold",threshold);
+        rtn.put("lines",lines);
+        rtn.put("testData",testData);
+        return rtn;
+    }
+
+    public static H2Consumer getConsumer() {
+        getProperties();
         return new H2Consumer(
                 new File("benchmarks/charts" + String.valueOf(lines) + "/foo-db"),
                 new File("benchmarks/charts" + String.valueOf(lines)),
@@ -70,16 +74,16 @@ public class JaroWinklerPerformanceTest extends AbstractBenchmark {
         listA = new ArrayList<String>();
         listB = new ArrayList<String>();
         try {
-            NxParser nxp = new NxParser(new FileInputStream("/Users/kvn/Downloads/DownloadStorage/labels_en_new.nt"));
+            NxParser nxp = new NxParser(new FileInputStream(testData));
             int i = 0;
-            while (nxp.hasNext() && i < 1000) {
+            while (nxp.hasNext() && i < lines) {
                 String tmp = nxp.next()[2].toN3();
                 tmp = tmp.substring(1, tmp.lastIndexOf("@")-1);
                 listA.add(tmp);
                 listB.add(tmp);
                 i++;
             }
-        } catch (FileNotFoundException e) {
+        } catch (Exception e) {
             // nothing to do...
         }
     }
