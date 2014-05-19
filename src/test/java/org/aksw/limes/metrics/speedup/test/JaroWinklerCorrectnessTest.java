@@ -1,10 +1,11 @@
-package org.aksw.limes.metrics.speedup.test;
+/*package org.aksw.limes.metrics.speedup.test;
 
 import junit.framework.Assert;
 import org.aksw.limes.metrics.speedup.JaroWinklerEntropyFilter;
 import org.aksw.limes.metrics.speedup.JaroWinklerLengthFilter;
 import org.aksw.limes.metrics.speedup.JaroWinklerMatcher;
 import org.aksw.limes.metrics.speedup.JaroWinklerMetric;
+import org.aksw.limes.metrics.speedup.test.JaroWinklerPerformanceTest;
 import org.junit.BeforeClass;
 import org.junit.Ignore;
 import org.junit.Test;
@@ -15,7 +16,6 @@ import java.io.FileNotFoundException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
-
 
 public class JaroWinklerCorrectnessTest {
 
@@ -57,3 +57,4 @@ public class JaroWinklerCorrectnessTest {
         Assert.assertEquals(matchesNative, matchesFiltered);
     }
 }
+*/

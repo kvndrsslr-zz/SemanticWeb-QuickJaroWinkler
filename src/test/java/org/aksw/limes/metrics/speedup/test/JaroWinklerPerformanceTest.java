@@ -28,11 +28,11 @@ import java.util.Properties;
 @BenchmarkHistoryChart(labelWith = LabelType.CUSTOM_KEY, maxRuns = 40)
 public class JaroWinklerPerformanceTest extends AbstractBenchmark {
 
-    private static H2Consumer consumer = getConsumer();
     private static ArrayList<String> listA, listB;
     private static double threshold;
     private static int lines;
-    public static String testData;
+    private static String testData;
+    private static H2Consumer consumer = getConsumer();
 
     @Rule
     public TestRule benchmarkRun = new BenchmarkRule(consumer);
@@ -88,7 +88,7 @@ public class JaroWinklerPerformanceTest extends AbstractBenchmark {
         }
     }
 
-    @BenchmarkOptions(benchmarkRounds = 1, warmupRounds = 0)
+    @BenchmarkOptions(benchmarkRounds = 3, warmupRounds = 1)
     @Test
     public void nativeJaroWinkler () {
         JaroWinklerMetric jw = new JaroWinklerMetric(true, false, false);
@@ -98,7 +98,7 @@ public class JaroWinklerPerformanceTest extends AbstractBenchmark {
     }
 
     @Ignore
-    @BenchmarkOptions(benchmarkRounds = 1, warmupRounds = 0)
+    @BenchmarkOptions(benchmarkRounds = 3, warmupRounds = 1)
     @Test
     public void allFilters () {
         JaroWinklerMetric jw = new JaroWinklerMetric(true, false, false);
@@ -109,7 +109,7 @@ public class JaroWinklerPerformanceTest extends AbstractBenchmark {
         jwm.match();
     }
 
-    @BenchmarkOptions(benchmarkRounds = 1, warmupRounds = 0)
+    @BenchmarkOptions(benchmarkRounds = 3, warmupRounds = 1)
     @Test
     public void rangeAndLengthFilters () {
         JaroWinklerMetric jw = new JaroWinklerMetric(true, false, false);
@@ -120,7 +120,7 @@ public class JaroWinklerPerformanceTest extends AbstractBenchmark {
     }
 
     @Ignore
-    @BenchmarkOptions(benchmarkRounds = 1, warmupRounds = 0)
+    @BenchmarkOptions(benchmarkRounds = 3, warmupRounds = 1)
     @Test
     public void rangeAndEntropyFilters () {
         JaroWinklerMetric jw = new JaroWinklerMetric(true, false, false);
@@ -130,7 +130,7 @@ public class JaroWinklerPerformanceTest extends AbstractBenchmark {
         jwm.match();
     }
 
-    @BenchmarkOptions(benchmarkRounds = 1, warmupRounds = 0)
+    @BenchmarkOptions(benchmarkRounds = 3, warmupRounds = 1)
     @Test
     public void lengthOnlyFilters () {
         JaroWinklerMetric jw = new JaroWinklerMetric(true, false, false);
@@ -140,7 +140,7 @@ public class JaroWinklerPerformanceTest extends AbstractBenchmark {
         jwm.match();
     }
     @Ignore
-    @BenchmarkOptions(benchmarkRounds = 1, warmupRounds = 0)
+    @BenchmarkOptions(benchmarkRounds = 3, warmupRounds = 1)
     @Test
     public void entropyOnlyFilters () {
         JaroWinklerMetric jw = new JaroWinklerMetric(true, false, false);
@@ -150,7 +150,7 @@ public class JaroWinklerPerformanceTest extends AbstractBenchmark {
         jwm.match();
     }
 
-    @BenchmarkOptions(benchmarkRounds = 1, warmupRounds = 0)
+    @BenchmarkOptions(benchmarkRounds = 3, warmupRounds = 1)
     @Test
     public void rangeOnlyFilters () {
         JaroWinklerMetric jw = new JaroWinklerMetric(true, false, false);
