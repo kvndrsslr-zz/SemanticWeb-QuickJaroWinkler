@@ -5,10 +5,10 @@
 
 
 declare -i thresholds=0;
-declare -i lines=1000;
-declare -i times=30;
+declare -i lines=10000;
+declare -i times=20;
 step=0.01;
-thresholdStart=0.7;
+thresholdStart=0.8;
 testData="./labels_en.nt"
 testDataUrl="http://downloads.dbpedia.org/3.9/en/labels_en.nt.bz2"
 
@@ -28,10 +28,11 @@ do
     threshold=${thresholdStart}
     while [ ${thresholds} -lt ${times} ]
     do
-	    ./gradlew clean;
+	    ./gradlew cleanTest;
 	    ./gradlew test -P threshold=${threshold} -P lines=${lines} -P testData=${testData}
 	    threshold=`echo "$threshold + $step" | bc`
 	    thresholds=thresholds+1;
+	    chmod -R 777 ./benchmarks
 	done;
 	lines=`echo "$lines * 10" | bc`
 done;
