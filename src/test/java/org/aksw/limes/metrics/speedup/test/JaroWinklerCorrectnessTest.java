@@ -1,13 +1,11 @@
-/*package org.aksw.limes.metrics.speedup.test;
+package org.aksw.limes.metrics.speedup.test;
 
 import junit.framework.Assert;
 import org.aksw.limes.metrics.speedup.JaroWinklerEntropyFilter;
 import org.aksw.limes.metrics.speedup.JaroWinklerLengthFilter;
 import org.aksw.limes.metrics.speedup.JaroWinklerMatcher;
 import org.aksw.limes.metrics.speedup.JaroWinklerMetric;
-import org.aksw.limes.metrics.speedup.test.JaroWinklerPerformanceTest;
 import org.junit.BeforeClass;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.semanticweb.yars.nx.parser.NxParser;
 
@@ -42,7 +40,6 @@ public class JaroWinklerCorrectnessTest {
         }
     }
 
-    @Ignore
     @Test
     public void verify () {
         HashMap<String, Map<String, Double>> matchesNative, matchesFiltered;
@@ -54,7 +51,19 @@ public class JaroWinklerCorrectnessTest {
         jw.addFilter(new JaroWinklerEntropyFilter(threshold));
         jwm = new JaroWinklerMatcher((ArrayList<String>) listA.clone(), (ArrayList<String>) listB.clone(), jw, threshold, true);
         matchesFiltered = jwm.match();
+        /*
+        TreeMap<String, TreeMap<String, Double>> matchesNativeSort, matchesFilteredSort;
+        matchesNativeSort = new TreeMap<String, TreeMap<String, Double>>();
+        matchesFilteredSort = new TreeMap<String, TreeMap<String, Double>>();
+        for (Map.Entry<String, Map<String,Double>> matchNative : matchesNative.entrySet()) {
+            matchesNativeSort.put(matchNative.getKey(), new TreeMap<String,Double>(matchNative.getValue()));
+        }
+        for (Map.Entry<String, Map<String,Double>> matchFiltered : matchesFiltered.entrySet()) {
+            matchesFilteredSort.put(matchFiltered.getKey(), new TreeMap<String,Double>(matchFiltered.getValue()));
+        }
+        Assert.assertEquals(matchesNativeSort, matchesFilteredSort);
+
+        */
         Assert.assertEquals(matchesNative, matchesFiltered);
     }
 }
-*/

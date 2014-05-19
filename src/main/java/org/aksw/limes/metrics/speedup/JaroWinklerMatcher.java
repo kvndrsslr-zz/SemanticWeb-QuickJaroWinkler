@@ -1,11 +1,8 @@
 package org.aksw.limes.metrics.speedup;
 
-import org.semanticweb.yars.nx.parser.NxParser;
-import java.io.FileInputStream;
-import java.io.FileWriter;
 import java.util.*;
 
-public class  JaroWinklerMatcher {
+public class JaroWinklerMatcher {
 
     private double threshold;
     private long comps;
@@ -112,7 +109,7 @@ public class  JaroWinklerMatcher {
                 similarityBook.put(a, (HashMap<String, Double>)(similarityTable.clone()));
             similarityTable.clear();
         }
-        System.out.println(comps);
+        //System.out.println(comps);
         return similarityBook;
     }
 

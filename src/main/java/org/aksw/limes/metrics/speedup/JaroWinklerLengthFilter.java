@@ -23,6 +23,8 @@ public class JaroWinklerLengthFilter extends AbstractMetricFilter {
             if (p != 0)
                 upperBoundJaroWinkler += 0.1d * p * (1.0d - upperBoundJaroWinkler);
         }
+        // this fixes correctness issues caused by floating point precision
+        upperBoundJaroWinkler += 0.00000000000001d;
         return upperBoundJaroWinkler;
     }
 
