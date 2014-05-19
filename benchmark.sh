@@ -4,7 +4,7 @@
 ###############################################
 
 
-declare -i thresholds=1;
+declare -i thresholds=0;
 declare -i lines=1000;
 declare -i times=30;
 step=0.01;
@@ -24,7 +24,7 @@ fi
 
 while [ ${lines} -lt 1000000 ]
 do
-    thresholds=1
+    thresholds=0
     threshold=${thresholdStart}
     while [ ${thresholds} -lt ${times} ]
     do

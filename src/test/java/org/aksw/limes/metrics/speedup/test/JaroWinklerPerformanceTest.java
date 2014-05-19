@@ -24,8 +24,8 @@ import java.util.HashMap;
 import java.util.Properties;
 
 
-@BenchmarkMethodChart(filePrefix = "benchmark-lists")
-@BenchmarkHistoryChart(labelWith = LabelType.CUSTOM_KEY, maxRuns = 40)
+@BenchmarkMethodChart(filePrefix = "test-graph")
+@BenchmarkHistoryChart(labelWith = LabelType.CUSTOM_KEY, maxRuns = 40, filePrefix = "history-graph")
 public class JaroWinklerPerformanceTest extends AbstractBenchmark {
 
     private static ArrayList<String> listA, listB;

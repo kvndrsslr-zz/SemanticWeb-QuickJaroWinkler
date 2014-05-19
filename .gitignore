@@ -1,0 +1,8 @@
+.idea/*
+.gradle/*
+build/*
+out/*
+*.txt
+SemanticWeb-QuickJaroWinkler.ipr
+SemanticWeb-QuickJaroWinkler.iws
+SemanticWeb-QuickJaroWinkler.iml
