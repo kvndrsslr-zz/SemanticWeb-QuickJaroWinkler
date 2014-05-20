@@ -25,6 +25,10 @@ dependencies {
     compile 'org.semanticweb.yars:nxparser:1.2.3'
 }
 
+test {
+    maxHeapSize = "512m"
+}
+
 test.doFirst {
     println "load data..."
     try {

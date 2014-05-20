@@ -17,6 +17,7 @@ public class JaroWinklerLengthFilter extends AbstractMetricFilter {
         aLen = Math.min(a.length,b.length);
         double bLen = Math.max(a.length, b.length);
         double upperBoundJaroWinkler = (2.0d / 3.0d) + (aLen / (3.0d * bLen));
+        upperBoundJaroWinkler += 0.00000000000001d;
         if (upperBoundJaroWinkler > JaroWinklerMetric.winklerBoostThreshold) {
             int pMax = Math.min(new Double(aLen).intValue(), 4);
             for (p = 0; p < pMax && a[p] == b[p]; p++);
@@ -24,7 +25,7 @@ public class JaroWinklerLengthFilter extends AbstractMetricFilter {
                 upperBoundJaroWinkler += 0.1d * p * (1.0d - upperBoundJaroWinkler);
         }
         // this fixes correctness issues caused by floating point precision
-        upperBoundJaroWinkler += 0.00000000000001d;
+        //upperBoundJaroWinkler += 0.00000000000001d;
         return upperBoundJaroWinkler;
     }
 
@@ -47,5 +48,11 @@ public class JaroWinklerLengthFilter extends AbstractMetricFilter {
             return -1;
         else
             return (int) Math.round(Math.ceil((0.6d * (double) aLen)/(3.0d * threshold - 2.4d) - (double) aLen));
+    }
+
+    public static void main (String[] args) {
+        JaroWinklerLengthFilter dummy = new JaroWinklerLengthFilter(0.8d);
+        double fuckme = dummy.score("Intel".toCharArray(),"International Association of Travel Agents Network".toCharArray());
+        double fuckyou = fuckme;
     }
 }

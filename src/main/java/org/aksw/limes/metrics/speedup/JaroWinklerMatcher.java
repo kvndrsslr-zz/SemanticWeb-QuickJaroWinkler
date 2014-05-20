@@ -109,6 +109,7 @@ public class JaroWinklerMatcher {
                 similarityBook.put(a, (HashMap<String, Double>)(similarityTable.clone()));
             similarityTable.clear();
         }
+
         //System.out.println(comps);
         return similarityBook;
     }
