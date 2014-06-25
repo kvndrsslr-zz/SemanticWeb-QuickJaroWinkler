@@ -24,13 +24,14 @@ public class JaroWinklerCorrectnessTest {
     @BeforeClass
     public static void setUpLists () {
         threshold = (Double) JaroWinklerPerformanceTest.getProperties().get("threshold");
-        threshold = 0.8d;
+        threshold = 0.9d;
         listA = new ArrayList<String>();
         listB = new ArrayList<String>();
         try {
             NxParser nxp = new NxParser(new FileInputStream((String) JaroWinklerPerformanceTest.getProperties().get("testData")));
             int i = 0;
-            while (nxp.hasNext() && i < 10000) { // (Integer) JaroWinklerPerformanceTest.getProperties().get("lines")
+            while (nxp.hasNext() && i < 10000) { // (Integer)
+            // JaroWinklerPerformanceTest.getProperties().get("lines")
                 String tmp = nxp.next()[2].toN3();
                 tmp = tmp.substring(1, tmp.lastIndexOf("@")-1);
                 listA.add(tmp);
@@ -41,7 +42,9 @@ public class JaroWinklerCorrectnessTest {
             // nothing to do...
         }
     }
-    @Ignore
+
+
+
     @Test
     public void verify () {
         HashMap<String, Map<String, Double>> matchesNative, matchesFiltered;
@@ -53,20 +56,6 @@ public class JaroWinklerCorrectnessTest {
         //jw.addFilter(new JaroWinklerEntropyFilter(threshold));
         jwm = new JaroWinklerMatcher((ArrayList<String>) listA.clone(), (ArrayList<String>) listB.clone(), jw, threshold, true);
         matchesFiltered = jwm.match();
-        /*
-        TreeMap<String, TreeMap<String, Double>> matchesNativeSort, matchesFilteredSort;
-        matchesNativeSort = new TreeMap<String, TreeMap<String, Double>>();
-        matchesFilteredSort = new TreeMap<String, TreeMap<String, Double>>();
-        for (Map.Entry<String, Map<String,Double>> matchNative : matchesNative.entrySet()) {
-            matchesNativeSort.put(matchNative.getKey(), new TreeMap<String,Double>(matchNative.getValue()));
-        }
-        for (Map.Entry<String, Map<String,Double>> matchFiltered : matchesFiltered.entrySet()) {
-            matchesFilteredSort.put(matchFiltered.getKey(), new TreeMap<String,Double>(matchFiltered.getValue()));
-        }
-        Assert.assertEquals(matchesNativeSort, matchesFilteredSort);
-
-        */
-        //assertEquals(matchesNative, matchesFiltered);
         for (Map.Entry<String, Map<String,Double>> matchNative : matchesNative.entrySet()) {
             if (!matchesFiltered.get(matchNative.getKey()).equals(matchNative.getValue())) {
                 System.err.println(matchesFiltered.get(matchNative.getKey()).toString());

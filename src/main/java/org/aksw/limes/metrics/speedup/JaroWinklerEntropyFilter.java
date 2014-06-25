@@ -1,21 +1,21 @@
 package org.aksw.limes.metrics.speedup;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map.Entry;
 
 public class JaroWinklerEntropyFilter extends AbstractMetricFilter {
 
     private char[] a;
     private double aLen;
-    private HashMap<Character, Integer> aEntropy;
+    private HashMap<String, HashMap<Character, Integer>> aEntropyMap, bEntropyMap;
+    HashMap<Character, Integer> aEntropy;
 
     @Override
     protected void setReference(char[] x) {
         a = x;
         aLen = x.length;
-        aEntropy = new HashMap<Character, Integer>(a.length);
-        for (int i = 0; i < aLen; i++)
-            aEntropy.put(a[i], aEntropy.get(a[i]) == null ? 1 : aEntropy.get(a[i]) + 1);
+        aEntropy = aEntropyMap.get(new String(x));
     }
 
     @Override
@@ -23,9 +23,9 @@ public class JaroWinklerEntropyFilter extends AbstractMetricFilter {
         int i;
         double m = 0;
         double bLen = b.length;
-        HashMap<Character, Integer> bEntropy = new HashMap<Character, Integer>(b.length);
-        for (i = 0; i < bLen; i++)
-            bEntropy.put(b[i], bEntropy.get(b[i]) == null ? 1 : bEntropy.get(b[i]) + 1);
+        HashMap<Character, Integer> bEntropy = aEntropyMap.get(new String(b));
+        if (aEntropy == null || bEntropy == null)
+            return 1.0d;
         HashMap<Character, Integer> minEntropy = aLen > bLen ? bEntropy : aEntropy;
         HashMap<Character, Integer> maxEntropy = aLen > bLen ? aEntropy : bEntropy;
         for (Entry<Character, Integer> entry : minEntropy.entrySet()) {
@@ -45,9 +45,23 @@ public class JaroWinklerEntropyFilter extends AbstractMetricFilter {
         return upperBoundJaroWinkler;
     }
 
-    public JaroWinklerEntropyFilter(double threshold) {
+    public JaroWinklerEntropyFilter(List<String> listA, List<String> listB, double threshold) {
         super(threshold);
+        this.aEntropyMap = this.constructEntropyMap(listA);
+        this.bEntropyMap = this.constructEntropyMap(listB);
         this.aEntropy = new HashMap<Character, Integer>();
+    }
+
+    private HashMap<String, HashMap<Character, Integer>> constructEntropyMap(List<String> list) {
+        HashMap<Character, Integer> returnRow;
+        HashMap<String, HashMap<Character, Integer>> returnMap = new HashMap<String, HashMap<Character, Integer>>();
+        for (String x : list) {
+            returnRow = new HashMap<Character, Integer>();
+            for (int i = 0; i < x.length(); i++)
+                returnRow.put(x.toCharArray()[i], returnRow.get(x.toCharArray()[i]) == null ? 1 : returnRow.get(x.toCharArray()[i]) + 1);
+            returnMap.put(x, (HashMap<Character, Integer>) returnRow.clone());
+        }
+        return returnMap;
     }
 
     @Override

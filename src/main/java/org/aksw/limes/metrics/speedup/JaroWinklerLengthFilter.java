@@ -17,6 +17,7 @@ public class JaroWinklerLengthFilter extends AbstractMetricFilter {
         aLen = Math.min(a.length,b.length);
         double bLen = Math.max(a.length, b.length);
         double upperBoundJaroWinkler = (2.0d / 3.0d) + (aLen / (3.0d * bLen));
+        // this fixes correctness issues caused by floating point precision
         upperBoundJaroWinkler += 0.00000000000001d;
         if (upperBoundJaroWinkler > JaroWinklerMetric.winklerBoostThreshold) {
             int pMax = Math.min(new Double(aLen).intValue(), 4);
@@ -24,8 +25,6 @@ public class JaroWinklerLengthFilter extends AbstractMetricFilter {
             if (p != 0)
                 upperBoundJaroWinkler += 0.1d * p * (1.0d - upperBoundJaroWinkler);
         }
-        // this fixes correctness issues caused by floating point precision
-        //upperBoundJaroWinkler += 0.00000000000001d;
         return upperBoundJaroWinkler;
     }
 
@@ -36,8 +35,6 @@ public class JaroWinklerLengthFilter extends AbstractMetricFilter {
     @Override
     public boolean apply (char[] a, char[] b) {
         boolean r = super.apply(a, b);
-        //if (r)
-            //System.err.println("Filtered input: (" + String.valueOf(a) + "," + String.valueOf(b) + ") for length");
         return r;
     }
 
@@ -50,9 +47,17 @@ public class JaroWinklerLengthFilter extends AbstractMetricFilter {
             return (int) Math.round(Math.ceil((0.6d * (double) aLen)/(3.0d * threshold - 2.4d) - (double) aLen));
     }
 
+
+    public static int minLenDeltaFor (int bLen, double threshold) {
+            return (int) Math.round(Math.floor(
+                    ((bLen * (3.0d * threshold - 2.4d)) / 0.6d) - (double) bLen
+            ));
+    }
+
     public static void main (String[] args) {
+        int a = JaroWinklerLengthFilter.minLenDeltaFor(5, 0.96);
         JaroWinklerLengthFilter dummy = new JaroWinklerLengthFilter(0.8d);
-        double fuckme = dummy.score("Intel".toCharArray(),"International Association of Travel Agents Network".toCharArray());
-        double fuckyou = fuckme;
+        double x = dummy.score("Intel".toCharArray(),"International Association of Travel Agents Network".toCharArray());
+        double y= x;
     }
 }
