@@ -8,4 +8,4 @@ This package implements range and individual filters with good scaling propertie
 
 # Further Information
 
-An online publication with further explanation of the used filters and real data evaluation can be found [here] (https://www.sharelatex.com/project/537233ccc0f23b3d4fd7276c/output/output.pdf).
+An online publication with further explanation of the used filters and real data evaluation can be found [here] (https://github.com/kvndrsslr/SemanticWeb-QuickJaroWinkler/blob/master/docs/Similarity_Filters_Jaro_Winkler.pdf?raw=true).
