@@ -1,10 +1,13 @@
 package org.aksw.limes.metrics.speedup.test;
 
 import static org.junit.Assert.*;
+
+import com.carrotsearch.junitbenchmarks.h2.H2Consumer;
 import org.aksw.limes.metrics.speedup.JaroWinklerEntropyFilter;
 import org.aksw.limes.metrics.speedup.JaroWinklerLengthFilter;
 import org.aksw.limes.metrics.speedup.JaroWinklerMatcher;
 import org.aksw.limes.metrics.speedup.JaroWinklerMetric;
+import org.aksw.limes.metrics.speedup.test.JaroWinklerPerformanceTest;
 import org.junit.BeforeClass;
 import org.junit.Ignore;
 import org.junit.Test;
@@ -44,7 +47,7 @@ public class JaroWinklerCorrectnessTest {
     }
 
 
-
+    @Ignore
     @Test
     public void verify () {
         HashMap<String, Map<String, Double>> matchesNative, matchesFiltered;

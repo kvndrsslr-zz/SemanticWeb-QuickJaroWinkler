@@ -1,5 +1,9 @@
 package org.aksw.limes.metrics.speedup;
 
+/**
+ * Length filter implementation
+ */
+
 public class JaroWinklerLengthFilter extends AbstractMetricFilter {
 
     private char[] a;

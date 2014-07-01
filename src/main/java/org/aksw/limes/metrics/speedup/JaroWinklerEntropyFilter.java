@@ -4,6 +4,10 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map.Entry;
 
+/**
+ * Character frequency filter implementation
+ */
+
 public class JaroWinklerEntropyFilter extends AbstractMetricFilter {
 
     private char[] a;

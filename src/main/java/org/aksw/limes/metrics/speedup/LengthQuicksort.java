@@ -2,14 +2,29 @@ package org.aksw.limes.metrics.speedup;
 
 import java.util.ArrayList;
 
-public class Quicksort  {
+/**
+ * Quicksort implementation to sort strings according to their lengths,
+ * not alphabetically.
+ */
 
+public class LengthQuicksort {
+
+    /**
+     * Public class method to quicksort lists
+     * @param values list of strings
+     */
     public static void sort(ArrayList<String> values) {
         if (values == null || values.size() == 0)
             return;
         quicksort(values, 0, values.size() - 1);
     }
 
+    /**
+     * Quicksort class method
+     * @param strings list of strings
+     * @param low low index
+     * @param high high index
+     */
     private static void quicksort(ArrayList<String> strings, int low, int high) {
         int i = low, j = high;
         int pivot = strings.get(low + (high-low)/2).length();
@@ -30,6 +45,12 @@ public class Quicksort  {
             quicksort(strings, i, high);
     }
 
+    /**
+     * Swap elements
+     * @param strings list of strings
+     * @param i index of element a to be swapped
+     * @param j index of element b to be swapped
+     */
     private static void exchange(ArrayList<String> strings, int i, int j) {
         String temp = strings.get(i);
         strings.set(i, strings.get(j));

@@ -26,7 +26,7 @@ import java.util.Properties;
 
 @BenchmarkMethodChart(filePrefix = "test-graph")
 @BenchmarkHistoryChart(labelWith = LabelType.CUSTOM_KEY, maxRuns = 40, filePrefix = "history-graph")
-public class JaroWinklerPerformanceTest extends AbstractBenchmark {
+public class JaroWinklerPerformanceTest {
 
     private static ArrayList<String> listA, listB;
     private static double threshold;
@@ -88,6 +88,7 @@ public class JaroWinklerPerformanceTest extends AbstractBenchmark {
         }
     }
 
+
     @BenchmarkOptions(benchmarkRounds = 1, warmupRounds = 0)
     @Test
     public void nativeJaroWinkler () {
@@ -110,6 +111,7 @@ public class JaroWinklerPerformanceTest extends AbstractBenchmark {
         jwm.match();
     }
 
+    @Ignore
     @BenchmarkOptions(benchmarkRounds = 1, warmupRounds = 0)
     @Test
     public void rangeAndLengthFilters () {
@@ -141,6 +143,7 @@ public class JaroWinklerPerformanceTest extends AbstractBenchmark {
         jwm = new JaroWinklerMatcher((ArrayList<String>) listA.clone(), (ArrayList<String>) listB.clone(), jw, threshold, false);
         jwm.match();
     }
+
     @Ignore
     @BenchmarkOptions(benchmarkRounds = 1, warmupRounds = 0)
     @Test
@@ -152,7 +155,7 @@ public class JaroWinklerPerformanceTest extends AbstractBenchmark {
         jwm.match();
     }
 
-
+    @Ignore
     @BenchmarkOptions(benchmarkRounds = 1, warmupRounds = 0)
     @Test
     public void rangeOnlyFilters () {

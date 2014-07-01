@@ -12,13 +12,9 @@ package org.aksw.limes.metrics.speedup;
  * is confidently less than or equal to that threshold.
  *
  * @author Kevin Dreßler
- * http://github.io/...    //todo: insert repository url
+ * https://github.com/kvndrsslr/SemanticWeb-QuickJaroWinkler
  */
 
-/*
-todo: implement an interface that performs better for a big number of alignments on *one* reference string:
-todo: so setReference(char[] ref) will precompute some things like length, the entropyMap, etc. to minify overhead
-*/
 public class JaroWinklerMetric extends AbstractFilteredMetric {
 
     private static char[][] sp =

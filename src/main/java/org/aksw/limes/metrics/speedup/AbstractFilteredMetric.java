@@ -4,6 +4,10 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.LinkedList;
 
+/**
+ * Abstract metric class
+ */
+
 public abstract class AbstractFilteredMetric {
     /**
      * List of stored filters

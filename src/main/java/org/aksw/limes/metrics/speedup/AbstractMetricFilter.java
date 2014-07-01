@@ -1,5 +1,9 @@
 package org.aksw.limes.metrics.speedup;
 
+/**
+ * Abstract filter class
+ */
+
 public abstract class AbstractMetricFilter {
 
     /**
