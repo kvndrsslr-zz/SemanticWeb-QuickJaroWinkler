@@ -32,7 +32,7 @@ then
 
 fi
 
-./gradlew downloadTestData -P testData=${testData} -P testDataUrl=${testDataUrl};
+gradle downloadTestData -P testData=${testData} -P testDataUrl=${testDataUrl};
 
 while [ ${lines} -lt ${maxlines} ]
 do
@@ -40,8 +40,8 @@ do
     threshold=${thresholdStart}
     while [ ${thresholds} -lt ${times} ]
     do
-	    ./gradlew cleanTest;
-	    ./gradlew test -P threshold=${threshold} -P lines=${lines} -P testData=${testData}
+	    gradle cleanTest;
+	    gradle test -P threshold=${threshold} -P lines=${lines} -P testData=${testData}
 	    threshold=`echo "$threshold + $step" | bc`
 	    thresholds=thresholds+1;
 	    chmod -R 777 ./benchmarks
