@@ -88,7 +88,7 @@ public class JaroWinklerPerformanceTest {
         }
     }
 
-
+    @Ignore
     @BenchmarkOptions(benchmarkRounds = 1, warmupRounds = 0)
     @Test
     public void nativeJaroWinkler () {
@@ -111,7 +111,7 @@ public class JaroWinklerPerformanceTest {
         jwm.match();
     }
 
-    @Ignore
+
     @BenchmarkOptions(benchmarkRounds = 1, warmupRounds = 0)
     @Test
     public void rangeAndLengthFilters () {

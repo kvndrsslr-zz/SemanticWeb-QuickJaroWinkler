@@ -60,6 +60,7 @@ public class JaroWinklerEntropyFilter extends AbstractMetricFilter {
         HashMap<Character, Integer> returnRow;
         HashMap<String, HashMap<Character, Integer>> returnMap = new HashMap<String, HashMap<Character, Integer>>();
         for (String x : list) {
+            x = x.toUpperCase();
             returnRow = new HashMap<Character, Integer>();
             for (int i = 0; i < x.length(); i++)
                 returnRow.put(x.toCharArray()[i], returnRow.get(x.toCharArray()[i]) == null ? 1 : returnRow.get(x.toCharArray()[i]) + 1);

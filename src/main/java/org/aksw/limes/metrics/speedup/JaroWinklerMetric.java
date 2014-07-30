@@ -106,7 +106,7 @@ public class JaroWinklerMetric extends AbstractFilteredMetric {
             ya = ya.toUpperCase();
         char[] yang = ya.toCharArray();
         if (filter(yin, yang))
-            return 0.0d;
+            return -1.0d;
         boolean[] yinFlags = new boolean[yin.length];
         boolean[] yangFlags = new boolean[yang.length];
         int i;

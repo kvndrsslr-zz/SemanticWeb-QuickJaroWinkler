@@ -1,5 +1,8 @@
 package org.aksw.limes.metrics.speedup;
 
+import org.semanticweb.yars.nx.parser.NxParser;
+
+import java.io.FileInputStream;
 import java.util.*;
 
 /**
@@ -100,14 +103,14 @@ public class JaroWinklerMatcher {
                     currentSim = metric.proximity(b);
                 if (currentSim >= threshold)
                     similarityTable.put(b, currentSim);
-                comps++;
+                else if (currentSim == -1.0d)
+                    comps++;
             }
-
-            if (i%1000 == 0)
-                System.out.println(String.valueOf(sumc-comps));
-            if (similarityTable.size() > 0)
-                similarityBook.put(a, (HashMap<String, Double>)(similarityTable.clone()));
+            if (similarityTable.size() > 0) {
+                similarityBook.put(a, (HashMap<String, Double>) (similarityTable.clone()));
+            }
         }
+        comps = sumc - comps;
         return similarityBook;
     }
 
@@ -119,4 +122,83 @@ public class JaroWinklerMatcher {
         return this.comps;
     }
 
+
+    public static void main (String[] args) {
+        System.out.println(String.valueOf(Character.valueOf('X').hashCode()));
+        /*
+        ArrayList<String> sourceList, targetList;
+        int lines = 1000;
+        sourceList = new ArrayList<String>();
+        targetList = new ArrayList<String>();
+        TreeMap<Double, Long> compMap = new TreeMap<Double, Long>();
+        try {
+            NxParser nxp = new NxParser(new FileInputStream("labels_en.nt"));
+            int i = 0;
+            while (nxp.hasNext() && i < lines) {
+                String tmp = nxp.next()[2].toN3();
+                tmp = tmp.substring(1, tmp.lastIndexOf("@")-1);
+                sourceList.add(tmp);
+                targetList.add(tmp);
+                i++;
+            }
+        } catch (Exception e) {
+            // not
+        }
+        for (double theta = 0.81d; theta < 1.0d; theta+=0.01d) {
+            JaroWinklerMetric metric = new JaroWinklerMetric(true, false, false);
+            JaroWinklerMatcher jm = new JaroWinklerMatcher((ArrayList<String>) sourceList.clone(), (ArrayList<String>) targetList.clone(), metric, theta, false);
+            jm.match();
+            compMap.put(theta, jm.getComps());
+        }
+        System.out.println(compMap.toString());
+        for (double theta = 0.81d; theta < 1.0d; theta+=0.01d) {
+            JaroWinklerMetric metric = new JaroWinklerMetric(true, false, false);
+            JaroWinklerMatcher jm = new JaroWinklerMatcher((ArrayList<String>) sourceList.clone(), (ArrayList<String>) targetList.clone(), metric, theta, true);
+            jm.match();
+            compMap.put(theta, jm.getComps());
+        }
+        System.out.println(compMap.toString());
+        for (double theta = 0.81d; theta < 1.0d; theta+=0.01d) {
+            JaroWinklerMetric metric = new JaroWinklerMetric(true, false, false);
+            metric.addFilter(new JaroWinklerLengthFilter(theta));
+            JaroWinklerMatcher jm = new JaroWinklerMatcher((ArrayList<String>) sourceList.clone(), (ArrayList<String>) targetList.clone(), metric, theta, false);
+            jm.match();
+            compMap.put(theta, jm.getComps());
+        }
+        System.out.println(compMap.toString());
+        for (double theta = 0.81d; theta < 1.0d; theta+=0.01d) {
+            JaroWinklerMetric metric = new JaroWinklerMetric(true, false, false);
+            metric.addFilter(new JaroWinklerEntropyFilter((ArrayList<String>) sourceList.clone(), (ArrayList<String>) targetList.clone(), theta));
+            JaroWinklerMatcher jm = new JaroWinklerMatcher((ArrayList<String>) sourceList.clone(), (ArrayList<String>) targetList.clone(), metric, theta, false);
+            jm.match();
+            compMap.put(theta, jm.getComps());
+        }
+        System.out.println(compMap.toString());
+        for (double theta = 0.81d; theta < 1.0d; theta+=0.01d) {
+            JaroWinklerMetric metric = new JaroWinklerMetric(true, false, false);
+            metric.addFilter(new JaroWinklerLengthFilter(theta));
+            JaroWinklerMatcher jm = new JaroWinklerMatcher((ArrayList<String>) sourceList.clone(), (ArrayList<String>) targetList.clone(), metric, theta, true);
+            jm.match();
+            compMap.put(theta, jm.getComps());
+        }
+        System.out.println(compMap.toString());
+
+        for (double theta = 0.81d; theta < 1.0d; theta+=0.01d) {
+            JaroWinklerMetric metric = new JaroWinklerMetric(true, false, false);
+            metric.addFilter(new JaroWinklerEntropyFilter((ArrayList<String>) sourceList.clone(), (ArrayList<String>) targetList.clone(), theta));
+            JaroWinklerMatcher jm = new JaroWinklerMatcher((ArrayList<String>) sourceList.clone(), (ArrayList<String>) targetList.clone(), metric, theta, true);
+            jm.match();
+            compMap.put(theta, jm.getComps());
+        }
+        System.out.println(compMap.toString());
+        for (double theta = 0.81d; theta < 1.0d; theta+=0.01d) {
+            JaroWinklerMetric metric = new JaroWinklerMetric(true, false, false);
+            metric.addFilter(new JaroWinklerLengthFilter(theta));
+            metric.addFilter(new JaroWinklerEntropyFilter((ArrayList<String>) sourceList.clone(), (ArrayList<String>) targetList.clone(), theta));
+            JaroWinklerMatcher jm = new JaroWinklerMatcher((ArrayList<String>) sourceList.clone(), (ArrayList<String>) targetList.clone(), metric, theta, true);
+            jm.match();
+            compMap.put(theta, jm.getComps());
+        }
+        System.out.println(compMap.toString());*/
+    }
 }
