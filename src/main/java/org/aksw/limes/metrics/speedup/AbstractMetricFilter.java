@@ -9,7 +9,7 @@ public abstract class AbstractMetricFilter {
     /**
      * threshold from which on will be filtered
      */
-    private double threshold;
+    protected double threshold;
 
     /**
      * Getter for threshold

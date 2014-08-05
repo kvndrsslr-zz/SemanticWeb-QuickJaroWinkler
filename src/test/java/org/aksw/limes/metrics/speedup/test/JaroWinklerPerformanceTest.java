@@ -1,13 +1,11 @@
 package org.aksw.limes.metrics.speedup.test;
 
-import com.carrotsearch.junitbenchmarks.AbstractBenchmark;
 import com.carrotsearch.junitbenchmarks.BenchmarkOptions;
 import com.carrotsearch.junitbenchmarks.BenchmarkRule;
 import com.carrotsearch.junitbenchmarks.annotation.BenchmarkHistoryChart;
 import com.carrotsearch.junitbenchmarks.annotation.BenchmarkMethodChart;
 import com.carrotsearch.junitbenchmarks.annotation.LabelType;
 import com.carrotsearch.junitbenchmarks.h2.H2Consumer;
-import org.aksw.limes.metrics.speedup.JaroWinklerEntropyFilter;
 import org.aksw.limes.metrics.speedup.JaroWinklerLengthFilter;
 import org.aksw.limes.metrics.speedup.JaroWinklerMatcher;
 import org.aksw.limes.metrics.speedup.JaroWinklerMetric;
@@ -95,7 +93,7 @@ public class JaroWinklerPerformanceTest {
         System.out.println(consumer.getHistoryHtmlTemplate());
         JaroWinklerMetric jw = new JaroWinklerMetric(true, false, false);
         JaroWinklerMatcher jwm;
-        jwm = new JaroWinklerMatcher((ArrayList<String>) listA.clone(), (ArrayList<String>) listB.clone(), jw, threshold, false);
+        jwm = new JaroWinklerMatcher((ArrayList<String>) listA.clone(), (ArrayList<String>) listB.clone(), jw, threshold);
         jwm.match();
     }
 
@@ -105,9 +103,8 @@ public class JaroWinklerPerformanceTest {
     public void allFilters () {
         JaroWinklerMetric jw = new JaroWinklerMetric(true, false, false);
         jw.addFilter(new JaroWinklerLengthFilter(threshold));
-        jw.addFilter(new JaroWinklerEntropyFilter((ArrayList<String>) listA.clone(), (ArrayList<String>) listB.clone(), threshold));
         JaroWinklerMatcher jwm;
-        jwm = new JaroWinklerMatcher((ArrayList<String>) listA.clone(), (ArrayList<String>) listB.clone(), jw, threshold, true);
+        jwm = new JaroWinklerMatcher((ArrayList<String>) listA.clone(), (ArrayList<String>) listB.clone(), jw, threshold);
         jwm.match();
     }
 
@@ -118,7 +115,7 @@ public class JaroWinklerPerformanceTest {
         JaroWinklerMetric jw = new JaroWinklerMetric(true, false, false);
         jw.addFilter(new JaroWinklerLengthFilter(threshold));
         JaroWinklerMatcher jwm;
-        jwm = new JaroWinklerMatcher((ArrayList<String>) listA.clone(), (ArrayList<String>) listB.clone(), jw, threshold, true);
+        jwm = new JaroWinklerMatcher((ArrayList<String>) listA.clone(), (ArrayList<String>) listB.clone(), jw, threshold);
         jwm.match();
     }
 
@@ -127,9 +124,8 @@ public class JaroWinklerPerformanceTest {
     @Test
     public void rangeAndEntropyFilters () {
         JaroWinklerMetric jw = new JaroWinklerMetric(true, false, false);
-        jw.addFilter(new JaroWinklerEntropyFilter((ArrayList<String>) listA.clone(), (ArrayList<String>) listB.clone(), threshold));
         JaroWinklerMatcher jwm;
-        jwm = new JaroWinklerMatcher((ArrayList<String>) listA.clone(), (ArrayList<String>) listB.clone(), jw, threshold, true);
+        jwm = new JaroWinklerMatcher((ArrayList<String>) listA.clone(), (ArrayList<String>) listB.clone(), jw, threshold);
         jwm.match();
     }
 
@@ -140,7 +136,7 @@ public class JaroWinklerPerformanceTest {
         JaroWinklerMetric jw = new JaroWinklerMetric(true, false, false);
         jw.addFilter(new JaroWinklerLengthFilter(threshold));
         JaroWinklerMatcher jwm;
-        jwm = new JaroWinklerMatcher((ArrayList<String>) listA.clone(), (ArrayList<String>) listB.clone(), jw, threshold, false);
+        jwm = new JaroWinklerMatcher((ArrayList<String>) listA.clone(), (ArrayList<String>) listB.clone(), jw, threshold);
         jwm.match();
     }
 
@@ -148,10 +144,9 @@ public class JaroWinklerPerformanceTest {
     @BenchmarkOptions(benchmarkRounds = 1, warmupRounds = 0)
     @Test
     public void entropyOnlyFilters () {
-        JaroWinklerMetric jw = new JaroWinklerMetric(false, false, false);
-        jw.addFilter(new JaroWinklerEntropyFilter((ArrayList<String>) listA.clone(), (ArrayList<String>) listB.clone(), threshold));
+        JaroWinklerMetric jw = new JaroWinklerMetric(true, false, false);
         JaroWinklerMatcher jwm;
-        jwm = new JaroWinklerMatcher((ArrayList<String>) listA.clone(), (ArrayList<String>) listB.clone(), jw, threshold, false);
+        jwm = new JaroWinklerMatcher((ArrayList<String>) listA.clone(), (ArrayList<String>) listB.clone(), jw, threshold);
         jwm.match();
     }
 
@@ -161,7 +156,7 @@ public class JaroWinklerPerformanceTest {
     public void rangeOnlyFilters () {
         JaroWinklerMetric jw = new JaroWinklerMetric(true, false, false);
         JaroWinklerMatcher jwm;
-        jwm = new JaroWinklerMatcher((ArrayList<String>) listA.clone(), (ArrayList<String>) listB.clone(), jw, threshold, true);
+        jwm = new JaroWinklerMatcher((ArrayList<String>) listA.clone(), (ArrayList<String>) listB.clone(), jw, threshold);
         jwm.match();
     }
 }

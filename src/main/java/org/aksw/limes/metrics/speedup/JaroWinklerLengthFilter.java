@@ -1,5 +1,9 @@
 package org.aksw.limes.metrics.speedup;
 
+import org.apache.commons.lang3.tuple.ImmutableTriple;
+
+import java.util.LinkedList;
+
 /**
  * Length filter implementation
  */
@@ -56,6 +60,37 @@ public class JaroWinklerLengthFilter extends AbstractMetricFilter {
             return (int) Math.round(Math.floor(
                     ((bLen * (3.0d * threshold - 2.4d)) / 0.6d) - (double) bLen
             ));
+    }
+
+    public static LinkedList<ImmutableTriple<Integer, Integer, Integer>> getSliceBoundaries(int maxSize, double threshold) {
+        LinkedList<ImmutableTriple<Integer, Integer, Integer>> sliceBoundaries = new LinkedList<ImmutableTriple<Integer, Integer, Integer>>();
+        int stmin, smax, tmax;
+        tmax = stmin = smax = 0;
+        boolean start = false;
+        while (tmax < maxSize) {
+            if (threshold >= 1.0d) {
+                sliceBoundaries.add(new ImmutableTriple<Integer, Integer, Integer>(tmax, tmax, tmax));
+                tmax++;
+            } else if (!start) {
+                if (tmax + JaroWinklerLengthFilter.minLenDeltaFor(tmax, threshold) > 1) {
+                    tmax--;
+                    sliceBoundaries.add(new ImmutableTriple<Integer, Integer, Integer>(stmin, smax, tmax));
+                    start = true;
+                    continue;
+                }
+                stmin = tmax + JaroWinklerLengthFilter.minLenDeltaFor(tmax, threshold);
+                smax = tmax + JaroWinklerLengthFilter.maxLenDeltaFor(tmax, threshold);
+                tmax++;
+            } else {
+                stmin = tmax;
+                tmax = smax;
+                smax = tmax + JaroWinklerLengthFilter.maxLenDeltaFor(tmax, threshold);
+                sliceBoundaries.add(new ImmutableTriple<Integer, Integer, Integer>(stmin, smax, tmax));
+            }
+        }
+        if (sliceBoundaries.size() == 0)
+            sliceBoundaries.add(new ImmutableTriple<Integer, Integer, Integer>(1, maxSize, maxSize));
+        return sliceBoundaries;
     }
 
     public static void main (String[] args) {
