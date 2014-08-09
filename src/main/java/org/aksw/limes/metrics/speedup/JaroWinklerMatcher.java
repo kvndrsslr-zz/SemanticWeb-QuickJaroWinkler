@@ -2,8 +2,12 @@ package org.aksw.limes.metrics.speedup;
 
 
 import org.apache.commons.lang3.tuple.*;
+import sun.jvm.hotspot.utilities.WorkerThread;
 
 import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 /**
  * Matches one list of strings against the other,
@@ -33,15 +37,16 @@ public class JaroWinklerMatcher {
      * match lists
      * @return Map of string alignments which were better than given threshold
      */
-    public HashMap<String, Map<String, Double>> match () {
-        HashMap<String, Map<String, Double>> similarityBook;
-        HashMap<String, Double> similarityTable;
+    public Map<String, Map<String, Double>> match () {
+        ConcurrentHashMap<String, Map<String, Double>> similarityBook;
+        //HashMap<String, Map<String, Double>> similarityBook;
+
         double currentSim;
         boolean first;
         similarityBook = new
-                HashMap<String, Map<String, Double>>(listA.size(), 1.0f);
+                ConcurrentHashMap<String, Map<String, Double>>(listA.size(), 1.0f);
 
-        /*
+
 
         List<String> red, blue;
         red = listA;
@@ -83,32 +88,18 @@ public class JaroWinklerMatcher {
 
 
         //@todo: create thread pool, port triefilter to Runable
-        */
 
 
-        JaroWinklerTrieFilter trieFilter = new JaroWinklerTrieFilter(listA, listB, threshold);
-        List<Pair<List<String>,List<String>>> filteredPairs = trieFilter.getFilteredPairs();
-        for (Pair<List<String>, List<String>> filteredPair : filteredPairs) {
-            for (String a : filteredPair.getLeft()) {
-                first = true;
-                similarityTable = new HashMap<String,
-                        Double>();
-                for (String b : filteredPair.getRight()) {
-                    if (first)
-                        currentSim = metric.proximity(a, b);
-                    else
-                        currentSim = metric.proximity(b);
-                    if (currentSim >= threshold)
-                        similarityTable.put(b, currentSim);
-                    if (currentSim > -1.0d)
-                        comps++;
-                    first = false;
-                }
-                if (similarityTable.size() > 0) {
-                    similarityBook.put(a, (HashMap<String, Double>) (similarityTable.clone()));
-                }
-            }
+        ExecutorService executor = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors());
+        for (Pair<List<String>, List<String>> tempPair : tempPairs) {
+            Runnable worker = new JaroWinklerTrieFilter(tempPair, similarityBook, metric, threshold);
+            executor.execute(worker);
+            Thread.currentThread().yield();
         }
+        executor.shutdown();
+        while (!executor.isTerminated());
+        System.out.println("Finished all threads");
+
         return similarityBook;
     }
 
