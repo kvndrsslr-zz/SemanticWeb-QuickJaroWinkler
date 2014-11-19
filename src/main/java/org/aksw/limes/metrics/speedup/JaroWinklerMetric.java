@@ -1,5 +1,7 @@
 package org.aksw.limes.metrics.speedup;
 
+import java.util.List;
+
 /**
  * This class implements the Jaro-Winkler algorithm that was designed as
  * a string subsequence alignment method for matching names in the US Census.
@@ -183,4 +185,16 @@ public class JaroWinklerMetric extends AbstractFilteredMetric {
         }
         return weight;
     }
+
+    public JaroWinklerMetric clone() {
+        JaroWinklerMetric clone = new JaroWinklerMetric(uppercase,longStrings,simOn);
+        List<AbstractMetricFilter> filters = getFilters();
+        for (AbstractMetricFilter filter : filters) {
+            if (filter instanceof JaroWinklerLengthFilter) {
+                clone.addFilter(new JaroWinklerLengthFilter(filter.getThreshold()));
+            }
+        }
+        return clone;
+    }
+
 }

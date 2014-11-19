@@ -6,7 +6,6 @@ import org.apache.commons.lang3.tuple.MutableTriple;
 import org.apache.commons.lang3.tuple.Pair;
 
 import java.util.*;
-import java.util.concurrent.ConcurrentHashMap;
 
 public class JaroWinklerTrieFilter implements Runnable {
 
@@ -26,12 +25,12 @@ public class JaroWinklerTrieFilter implements Runnable {
         this.metric = metric;
     }
 
-    private int minMismatches(int maxRed, int maxBlue) {
-        return maxBlue - (int) Math.round(Math.ceil((threshold - 0.6d)*((3*(double)maxBlue*(double)maxRed)/(0.6d*(((double)maxBlue+(double)maxRed))))));
+    private int matchesNeeded(int red, int blue) {
+        return (int) Math.round(Math.ceil((threshold - 0.6d)*((3*(double)blue*(double)red)/(0.6d*(((double)blue+(double)red))))));
     }
 
     private double characterFrequencyFilter (int l1, int l2, int m) {
-        double theta = ((m/l1) + (m/l2) + 1.0d) / 3.0d;
+        double theta = (((double)m/(double)l1) + ((double)m/(double)l2) + 1.0d) / 3.0d;
         if (theta > JaroWinklerMetric.winklerBoostThreshold)
             theta = theta + 0.4d * (1.0d-theta);
         return theta;
@@ -39,74 +38,88 @@ public class JaroWinklerTrieFilter implements Runnable {
 
     @Override
     public void run() {
-        System.out.println("Thread started");
-        int maxBlue = tempPair.getRight().size() == 0 ? 0 :
-                tempPair.getRight().get(tempPair.getRight().size()-1).length();
+
+        List<String> red, blue, _swap;
+        red = tempPair.getLeft();
+        blue = tempPair.getRight();
+        boolean swapped = false;
+
+        // due to certain conditions left can have larger strings than right
+        // it is uncommon, but possible, so check & swap if necessary
+        if (red.get(red.size()-1).length() > blue.get(blue.size()-1).length()) {
+            _swap = red;
+            red = blue;
+            blue = _swap;
+            swapped = true;
+        }
+
+        int minRed = red.get(0).length();
+        int maxRed = red.get(red.size()-1).length();
+
         JaroWinklerTrieNode root = new JaroWinklerTrieNode();
-        // construct trie from blue part
-        for (String s : tempPair.getRight()) {
+        // construct trie from red part
+        for (String s : red) {
             root.addChild(s, s);
         }
-        // construct a map of containers from red part
-        Map<String, List<String>> redContainers = new HashMap<String, List<String>>();
-        for (String s : tempPair.getLeft()) {
+        // construct a map of containers from blue part
+        Map<String, List<String>> blueContainers = new HashMap<String, List<String>>();
+        for (String s : blue) {
             char[] key = s.toCharArray();
             Arrays.sort(key);
             String skey = String.valueOf(key);
-            if (redContainers.get(skey) == null)
-                redContainers.put(skey, new LinkedList<String>());
-            redContainers.get(skey).add(s);
+            if (blueContainers.get(skey) == null)
+                blueContainers.put(skey, new LinkedList<String>());
+            blueContainers.get(skey).add(s);
         }
         // iterate through the map
-        for (String redKey : redContainers.keySet()) {
-            List<String> blueMatches = new LinkedList<String>();
-            int maxRed = redKey.length();
+        for (String blueKey : blueContainers.keySet()) {
+            List<String> redMatches = new LinkedList<String>();
+            int maxBlue = blueKey.length();
             int matches = 0;
             Stack<Character> referenceStack = new Stack<Character>();
-            char[] charArray = redKey.toCharArray();
+            char[] charArray = blueKey.toCharArray();
             for (int i = charArray.length-1; i >= 0; i--) {
                 char c = charArray[i];
                 referenceStack.push(c);
             }
-            Stack<MutableTriple<Stack<Character>, JaroWinklerTrieNode, Integer>> blueStack =
+            Stack<MutableTriple<Stack<Character>, JaroWinklerTrieNode, Integer>> redStack =
                     new Stack<MutableTriple<Stack<Character>, JaroWinklerTrieNode, Integer>>();
             // set inital algorithm stack
             for (Character key : root.children.keySet()) {
-                blueStack.add(new MutableTriple<Stack<Character>, JaroWinklerTrieNode, Integer>(
+                redStack.add(new MutableTriple<Stack<Character>, JaroWinklerTrieNode, Integer>(
                         (Stack<Character>) referenceStack.clone(), root.children.get(key), matches));
             }
             // until the stack is empty, pop and evaluate
-            while (!blueStack.isEmpty()) {
+            while (!redStack.isEmpty()) {
                 MutableTriple<Stack<Character>, JaroWinklerTrieNode, Integer> current =
-                        blueStack.pop();
-                int safeMismatches = maxRed - (current.getLeft().size() + current.getRight());
-                if (safeMismatches <= minMismatches(maxRed, maxBlue)) {
+                        redStack.pop();
+                int maxPossibleMatches = Math.min(current.getLeft().size(), maxRed - current.getMiddle().getLevel() + 1) + current.getRight();
+                if (maxPossibleMatches >= matchesNeeded(maxBlue, minRed)) {
                     int currentOrder = current.getLeft().isEmpty() ? -1 : new Character(current.getMiddle().key).compareTo(current.getLeft().peek());
                     if (currentOrder <= 0) {
                         if (currentOrder == 0) {
                             current.getLeft().pop();
                             current.setRight(current.getRight()+1);
-                            if (current.getRight() >= maxBlue - minMismatches(maxRed, maxBlue)
+                            if (current.getRight() >= matchesNeeded(maxBlue, current.getMiddle().getLevel())
                                     && current.getMiddle().data != null && current.getMiddle().data.size() > 0
-                                    && characterFrequencyFilter(current.getMiddle().data.get(0).length(), redKey.length(), matches) >= threshold) {
-                                blueMatches.addAll(current.getMiddle().data);
+                                    && characterFrequencyFilter(current.getMiddle().getLevel(), blueKey.length(), current.getRight()) >= threshold) {
+                                redMatches.addAll(current.getMiddle().data);
                             }
                         }
                         for (Character key : current.getMiddle().children.keySet()) {
-                            blueStack.push(new MutableTriple<Stack<Character>, JaroWinklerTrieNode, Integer>(
+                            redStack.push(new MutableTriple<Stack<Character>, JaroWinklerTrieNode, Integer>(
                                     (Stack<Character>)current.getLeft().clone(), current.getMiddle().children.get(key), new Integer(current.getRight().intValue())));
                         }
                     } else {
                         current.getLeft().pop();
-                        blueStack.push(current);
+                        redStack.push(current);
                     }
                 }
             }
-            if (blueMatches.size() > 0)
-                filteredPairs.add(new MutablePair<List<String>, List<String>>(redContainers.get(redKey), new LinkedList<String>(blueMatches)));
-
+            if (redMatches.size() > 0)
+                filteredPairs.add(new MutablePair<List<String>, List<String>>(blueContainers.get(blueKey), new LinkedList<String>(redMatches)));
         }
-        /*
+
         boolean first;
         double currentSim;
         int comps = 0;
@@ -114,10 +127,10 @@ public class JaroWinklerTrieFilter implements Runnable {
 
 
         for (Pair<List<String>, List<String>> filteredPair : filteredPairs) {
-            for (String a : filteredPair.getLeft()) {
+            for (String a : swapped ? filteredPair.getRight() : filteredPair.getLeft()) {
                 first = true;
                 similarityTable.clear();
-                for (String b : filteredPair.getRight()) {
+                for (String b : !swapped ? filteredPair.getRight() : filteredPair.getLeft()) {
                     if (first)
                         currentSim = metric.proximity(a, b);
                     else
@@ -133,7 +146,5 @@ public class JaroWinklerTrieFilter implements Runnable {
                 }
             }
         }
-        */
-        System.out.println("Thread stopped");
     }
 }

@@ -38,15 +38,12 @@ public class JaroWinklerMatcher {
      * @return Map of string alignments which were better than given threshold
      */
     public Map<String, Map<String, Double>> match () {
+
         ConcurrentHashMap<String, Map<String, Double>> similarityBook;
         //HashMap<String, Map<String, Double>> similarityBook;
 
-        double currentSim;
-        boolean first;
         similarityBook = new
                 ConcurrentHashMap<String, Map<String, Double>>(listA.size(), 1.0f);
-
-
 
         List<String> red, blue;
         red = listA;
@@ -60,24 +57,27 @@ public class JaroWinklerMatcher {
             blue = temp;
         }
 
-
         List<Pair<List<String>, List<String>>> tempPairs = new LinkedList<Pair<List<String>, List<String>>>();
         // generate length filtered partitions
-        if (JaroWinklerLengthFilter.maxLenDeltaFor(1, threshold) != -1) {
-            //@todo: test dual threshold specification (sweet spot around 0.91d)
+        if (JaroWinklerLengthFilter.maxLenDeltaFor(1, threshold) != -1 && true) {
             List<ImmutableTriple<Integer, Integer, Integer>> sliceBoundaries =
-                    JaroWinklerLengthFilter.getSliceBoundaries(red.get(red.size()-1).length(), threshold);
+                    JaroWinklerLengthFilter.getSliceBoundaries(blue.get(blue.size()-1).length(), threshold);
             for (ImmutableTriple<Integer, Integer, Integer> sliceBoundary : sliceBoundaries) {
                 MutablePair<List<String>, List<String>> m = new MutablePair<List<String>, List<String>>();
                 m.setLeft(new LinkedList<String>());
                 m.setRight(new LinkedList<String>());
                 for (String s : red)
-                    if (s.length() >= sliceBoundary.getLeft() && s.length() <= sliceBoundary.getMiddle())
+                    if (s.length() >= sliceBoundary.getMiddle() && s.length() <= sliceBoundary.getRight())
                         m.getLeft().add(s);
+                    else if (s.length() > sliceBoundary.getRight())
+                        break;
                 for (String s : blue)
-                    if (s.length() >= sliceBoundary.getLeft() && s.length() <= sliceBoundary.getRight())
+                    if (s.length() == sliceBoundary.getLeft())
                         m.getRight().add(s);
-                tempPairs.add(m);
+                    else if (s.length() > sliceBoundary.getLeft())
+                        break;
+                if (m.getRight().size() > 0 && m.getLeft().size() > 0)
+                    tempPairs.add(m);
             }
         } else {
             MutablePair<List<String>, List<String>> m = new MutablePair<List<String>, List<String>>();
@@ -86,20 +86,24 @@ public class JaroWinklerMatcher {
             tempPairs.add(m);
         }
 
+        System.out.println("Partitioned into " + String.valueOf(tempPairs.size()) + " sets.");
+        System.out.println("Initializing Threadpool for " + String.valueOf(Runtime.getRuntime().availableProcessors()) + " threads.");
 
-        //@todo: create thread pool, port triefilter to Runable
-
-
+        //create thread pool, one thread per partition
         ExecutorService executor = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors());
+        executor = Executors.newFixedThreadPool(1);
         for (Pair<List<String>, List<String>> tempPair : tempPairs) {
-            Runnable worker = new JaroWinklerTrieFilter(tempPair, similarityBook, metric, threshold);
+            Runnable worker = new JaroWinklerTrieFilter(tempPair, similarityBook, metric.clone(), threshold);
             executor.execute(worker);
-            Thread.currentThread().yield();
         }
         executor.shutdown();
-        while (!executor.isTerminated());
-        System.out.println("Finished all threads");
-
+        while (!executor.isTerminated()) {
+            try {
+                Thread.sleep(500);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+        }
         return similarityBook;
     }
 

@@ -64,32 +64,9 @@ public class JaroWinklerLengthFilter extends AbstractMetricFilter {
 
     public static LinkedList<ImmutableTriple<Integer, Integer, Integer>> getSliceBoundaries(int maxSize, double threshold) {
         LinkedList<ImmutableTriple<Integer, Integer, Integer>> sliceBoundaries = new LinkedList<ImmutableTriple<Integer, Integer, Integer>>();
-        int stmin, smax, tmax;
-        tmax = stmin = smax = 0;
-        boolean start = false;
-        while (tmax < maxSize) {
-            if (threshold >= 1.0d) {
-                sliceBoundaries.add(new ImmutableTriple<Integer, Integer, Integer>(tmax, tmax, tmax));
-                tmax++;
-            } else if (!start) {
-                if (tmax + JaroWinklerLengthFilter.minLenDeltaFor(tmax, threshold) > 1) {
-                    tmax--;
-                    sliceBoundaries.add(new ImmutableTriple<Integer, Integer, Integer>(stmin, smax, tmax));
-                    start = true;
-                    continue;
-                }
-                stmin = tmax + JaroWinklerLengthFilter.minLenDeltaFor(tmax, threshold);
-                smax = tmax + JaroWinklerLengthFilter.maxLenDeltaFor(tmax, threshold);
-                tmax++;
-            } else {
-                stmin = tmax;
-                tmax = smax;
-                smax = tmax + JaroWinklerLengthFilter.maxLenDeltaFor(tmax, threshold);
-                sliceBoundaries.add(new ImmutableTriple<Integer, Integer, Integer>(stmin, smax, tmax));
-            }
+        for (int t = 1; t <= maxSize; t++) {
+            sliceBoundaries.add(new ImmutableTriple<Integer, Integer, Integer>(t, t+minLenDeltaFor(t, threshold), t+maxLenDeltaFor(t, threshold)));
         }
-        if (sliceBoundaries.size() == 0)
-            sliceBoundaries.add(new ImmutableTriple<Integer, Integer, Integer>(1, maxSize, maxSize));
         return sliceBoundaries;
     }
 
