@@ -2,8 +2,6 @@ package org.aksw.limes.metrics.speedup;
 
 
 import org.apache.commons.lang3.tuple.*;
-import sun.jvm.hotspot.utilities.WorkerThread;
-
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ExecutorService;
@@ -21,12 +19,14 @@ public class JaroWinklerMatcher {
     private long comps;
     private List<String> listA, listB;
     private JaroWinklerMetric metric;
+    private int cores;
 
-    public JaroWinklerMatcher (List<String> listA, List<String> listB, JaroWinklerMetric metric, double theshold) {
+    public JaroWinklerMatcher (List<String> listA, List<String> listB, JaroWinklerMetric metric, double theshold, int cores) {
         this.threshold = theshold;
         this.metric = metric;
         this.listB = listB;
         this.listA = listA;
+        this.cores = cores;
         if (JaroWinklerLengthFilter.maxLenDeltaFor(1, threshold) != -1) {
             LengthQuicksort.sort((ArrayList<String>) listA);
             LengthQuicksort.sort((ArrayList<String>) listB);
@@ -90,8 +90,7 @@ public class JaroWinklerMatcher {
         System.out.println("Initializing Threadpool for " + String.valueOf(Runtime.getRuntime().availableProcessors()) + " threads.");
 
         //create thread pool, one thread per partition
-        ExecutorService executor = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors());
-        executor = Executors.newFixedThreadPool(1);
+        ExecutorService executor = Executors.newFixedThreadPool(Math.min(this.cores, Runtime.getRuntime().availableProcessors()));
         for (Pair<List<String>, List<String>> tempPair : tempPairs) {
             Runnable worker = new JaroWinklerTrieFilter(tempPair, similarityBook, metric.clone(), threshold);
             executor.execute(worker);

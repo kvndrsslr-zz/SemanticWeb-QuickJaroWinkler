@@ -29,6 +29,7 @@ public class JaroWinklerPerformanceTest {
     private static ArrayList<String> listA, listB;
     private static double threshold;
     private static int lines;
+    private static int cores;
     private static String testData;
     private static H2Consumer consumer = getConsumer();
 
@@ -38,6 +39,7 @@ public class JaroWinklerPerformanceTest {
     public static HashMap<String, Object> getProperties() {
         threshold = 0.89d;
         lines = 10000;
+        cores = 1;
         testData = "labels_en.nt";
         Properties prop = new Properties();
         try {
@@ -46,6 +48,7 @@ public class JaroWinklerPerformanceTest {
             stream.close();
             threshold = Double.valueOf(prop.getProperty("threshold"));
             lines = Integer.valueOf(prop.getProperty("lines"));
+            cores = Integer.valueOf(prop.getProperty("cores"));
             testData = prop.getProperty("testData").equals("") ? testData : prop.getProperty("testData");
         } catch (FileNotFoundException e) {
 
@@ -56,6 +59,7 @@ public class JaroWinklerPerformanceTest {
         rtn.put("threshold",threshold);
         rtn.put("lines",lines);
         rtn.put("testData",testData);
+        rtn.put("cores",cores);
         return rtn;
     }
 
@@ -64,7 +68,7 @@ public class JaroWinklerPerformanceTest {
         return new H2Consumer(
                 new File("benchmarks/charts" + String.valueOf(lines) + "/foo-db"),
                 new File("benchmarks/charts" + String.valueOf(lines)),
-                String.valueOf(threshold));
+                String.valueOf(threshold) + "," + String.valueOf(cores) );
     }
 
     @BeforeClass
@@ -76,7 +80,7 @@ public class JaroWinklerPerformanceTest {
             int i = 0;
             while (nxp.hasNext() && i < lines) {
                 String tmp = nxp.next()[2].toN3();
-                tmp = tmp.substring(1, tmp.lastIndexOf("@")-1);
+                tmp = tmp.lastIndexOf("@")== -1 ? tmp : tmp.substring(1,tmp.lastIndexOf("@")-1);
                 listA.add(tmp);
                 listB.add(tmp);
                 i++;
@@ -86,77 +90,15 @@ public class JaroWinklerPerformanceTest {
         }
     }
 
-    @Ignore
-    @BenchmarkOptions(benchmarkRounds = 1, warmupRounds = 0)
-    @Test
-    public void nativeJaroWinkler () {
-        System.out.println(consumer.getHistoryHtmlTemplate());
-        JaroWinklerMetric jw = new JaroWinklerMetric(true, false, false);
-        JaroWinklerMatcher jwm;
-        jwm = new JaroWinklerMatcher((ArrayList<String>) listA.clone(), (ArrayList<String>) listB.clone(), jw, threshold);
-        jwm.match();
-    }
 
-    @Ignore
     @BenchmarkOptions(benchmarkRounds = 1, warmupRounds = 0)
     @Test
-    public void allFilters () {
+    public void parallelTest () {
         JaroWinklerMetric jw = new JaroWinklerMetric(true, false, false);
         jw.addFilter(new JaroWinklerLengthFilter(threshold));
         JaroWinklerMatcher jwm;
-        jwm = new JaroWinklerMatcher((ArrayList<String>) listA.clone(), (ArrayList<String>) listB.clone(), jw, threshold);
+        jwm = new JaroWinklerMatcher((ArrayList<String>) listA.clone(), (ArrayList<String>) listB.clone(), jw, threshold, cores);
         jwm.match();
     }
 
-
-    @BenchmarkOptions(benchmarkRounds = 1, warmupRounds = 0)
-    @Test
-    public void rangeAndLengthFilters () {
-        JaroWinklerMetric jw = new JaroWinklerMetric(true, false, false);
-        jw.addFilter(new JaroWinklerLengthFilter(threshold));
-        JaroWinklerMatcher jwm;
-        jwm = new JaroWinklerMatcher((ArrayList<String>) listA.clone(), (ArrayList<String>) listB.clone(), jw, threshold);
-        jwm.match();
-    }
-
-    @Ignore
-    @BenchmarkOptions(benchmarkRounds = 1, warmupRounds = 0)
-    @Test
-    public void rangeAndEntropyFilters () {
-        JaroWinklerMetric jw = new JaroWinklerMetric(true, false, false);
-        JaroWinklerMatcher jwm;
-        jwm = new JaroWinklerMatcher((ArrayList<String>) listA.clone(), (ArrayList<String>) listB.clone(), jw, threshold);
-        jwm.match();
-    }
-
-    @Ignore
-    @BenchmarkOptions(benchmarkRounds = 1, warmupRounds = 0)
-    @Test
-    public void lengthOnlyFilters () {
-        JaroWinklerMetric jw = new JaroWinklerMetric(true, false, false);
-        jw.addFilter(new JaroWinklerLengthFilter(threshold));
-        JaroWinklerMatcher jwm;
-        jwm = new JaroWinklerMatcher((ArrayList<String>) listA.clone(), (ArrayList<String>) listB.clone(), jw, threshold);
-        jwm.match();
-    }
-
-    @Ignore
-    @BenchmarkOptions(benchmarkRounds = 1, warmupRounds = 0)
-    @Test
-    public void entropyOnlyFilters () {
-        JaroWinklerMetric jw = new JaroWinklerMetric(true, false, false);
-        JaroWinklerMatcher jwm;
-        jwm = new JaroWinklerMatcher((ArrayList<String>) listA.clone(), (ArrayList<String>) listB.clone(), jw, threshold);
-        jwm.match();
-    }
-
-    @Ignore
-    @BenchmarkOptions(benchmarkRounds = 1, warmupRounds = 0)
-    @Test
-    public void rangeOnlyFilters () {
-        JaroWinklerMetric jw = new JaroWinklerMetric(true, false, false);
-        JaroWinklerMatcher jwm;
-        jwm = new JaroWinklerMatcher((ArrayList<String>) listA.clone(), (ArrayList<String>) listB.clone(), jw, threshold);
-        jwm.match();
-    }
 }

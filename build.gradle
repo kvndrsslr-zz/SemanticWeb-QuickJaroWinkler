@@ -38,9 +38,9 @@ test {
 test.doFirst {
     println "load data..."
     try {
-        println "load data test $threshold $lines $testData"
+        println "load data test $threshold $lines $testData $cores"
         FileWriter f = new FileWriter("src/test/resources/testConfig.properties");
-        f.write("threshold=$threshold\nlines=$lines\ntestData=$testData");
+        f.write("threshold=$threshold\nlines=$lines\ntestData=$testData\ncores=$cores");
         f.close();
     } catch (Exception e) {
 
